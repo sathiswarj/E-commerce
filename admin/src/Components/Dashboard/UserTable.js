@@ -1,28 +1,49 @@
 import React from "react";
 
-const UsersTable = ({ users }) => {
+const CommonTable = ({ columns = [], data = [] }) => {
   return (
     <div className="mt-6 bg-white shadow rounded overflow-x-auto">
-      <table className="w-full text-left table-auto border-collapse">
-        <thead className="bg-gray-50">
+      <table className="w-full border-collapse">
+        <thead className="bg-gray-100">
           <tr>
-            <th className="p-3 border-b">Name</th>
-            <th className="p-3 border-b">Email</th>
-            <th className="p-3 border-b">Role</th>
+            {columns.map((col, idx) => (
+              <th
+                key={idx}
+                className="px-6 py-3 text-left text-sm font-semibold text-gray-700 border-b"
+              >
+                {col.header}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {users.map((user, idx) => (
-            <tr key={idx} className="hover:bg-gray-100">
-              <td className="p-3 border-b">{user.name}</td>
-              <td className="p-3 border-b">{user.email}</td>
-              <td className="p-3 border-b">{user.role}</td>
+          {data.length > 0 ? (
+            data.map((row, rowIdx) => (
+              <tr key={rowIdx} className="hover:bg-gray-50">
+                {columns.map((col, colIdx) => (
+                  <td
+                    key={colIdx}
+                    className="px-6 py-3 text-sm text-gray-800 border-b"
+                  >
+                    {row[col.accessor] || "-"}
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={columns.length}
+                className="px-6 py-3 text-center text-gray-500"
+              >
+                No data available
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
   );
 };
 
-export default UsersTable;
+export default CommonTable;

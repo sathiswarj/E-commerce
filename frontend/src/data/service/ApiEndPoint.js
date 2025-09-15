@@ -1,3 +1,3 @@
 export const API_ENDPOINT  = {
-    corePath: "http://localhost:5000/"
+    corePath: "http://localhost:5000/api/"
 }
