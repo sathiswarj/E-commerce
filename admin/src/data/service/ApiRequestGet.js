@@ -9,4 +9,11 @@ export const ApiRequestGet = {
          
         });
       },
+       getAllProducts: () => {
+        return ApiGetServiceWrapper({
+          url: API_ENDPOINT.corePath + "products",
+          headers: { "Content-Type": "application/json" },
+         
+        });
+      },
 }

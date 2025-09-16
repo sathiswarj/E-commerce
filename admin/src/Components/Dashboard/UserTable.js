@@ -20,14 +20,32 @@ const CommonTable = ({ columns = [], data = [] }) => {
           {data.length > 0 ? (
             data.map((row, rowIdx) => (
               <tr key={rowIdx} className="hover:bg-gray-50">
-                {columns.map((col, colIdx) => (
-                  <td
-                    key={colIdx}
-                    className="px-6 py-3 text-sm text-gray-800 border-b"
-                  >
-                    {row[col.accessor] || "-"}
-                  </td>
-                ))}
+                {columns.map((col, colIdx) => {
+                  let value = row[col.accessor];
+
+                  // Format "Created At" column
+                  if (col.accessor === "createdAt" && value) {
+                    const date = new Date(value);
+                    const day = String(date.getDate()).padStart(2, "0");
+                    const month = String(date.getMonth() + 1).padStart(2, "0");
+                    const year = date.getFullYear();
+                    value = `${day}-${month}-${year}`;
+                  }
+
+                  // Format arrays as comma-separated strings
+                  if (Array.isArray(value)) {
+                    value = value.join(", ");
+                  }
+
+                  return (
+                    <td
+                      key={colIdx}
+                      className="px-6 py-3 text-sm text-gray-800 border-b"
+                    >
+                      {value || "-"}
+                    </td>
+                  );
+                })}
               </tr>
             ))
           ) : (

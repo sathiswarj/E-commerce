@@ -47,7 +47,18 @@ const getProduct = async (req, res) => {
 }
 
 const getAllProducts = async (req, res) => {
+ try {
+    const allProducts = await productModel.find();
 
+    // Always respond with JSON, even if empty
+    return res.status(200).json({
+      success: true,
+      data: allProducts, // empty array if no users
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 }
 
 const updateProduct = async (req, res) => { 

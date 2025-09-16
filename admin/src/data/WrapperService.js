@@ -23,16 +23,21 @@ export const ApiGetServiceWrapperBlob = ({ url = "", headers = {} }) => {
 };
 
 export const ApiPostServiceWrapper = async ({ url = "", headers = {}, body = {} }) => {
+  const isFormData = body instanceof FormData;
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
-       "Content-Type": "application/json",
+      Authorization: "Bearer " + getToken(),
+       ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...headers,
     },
-    body: JSON.stringify(body),
+    body: isFormData ? body : JSON.stringify(body),
   });
+
   return await res.json();
 };
+
 
 export const ApiPutServiceWrapper = async ({ url = "", headers = {}, body = {} }) => {
   const res = await fetch(url, {
