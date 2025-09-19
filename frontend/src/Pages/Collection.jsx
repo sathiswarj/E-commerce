@@ -3,6 +3,7 @@ import { ShopContext } from "../context/Shopcontext.jsx";
 import ProductItem from "./ProductItem.jsx";
 import { assets } from "../assets/assets.js";
 import Title from "../components/Title.jsx";
+import { ApiRequestGet } from "../data/service/ApiRequestGet.js";
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(ShopContext);
@@ -76,6 +77,20 @@ const Collection = () => {
       setFilterProducts(sorted);
     }
   }, [products, selectedCategories, subCategory, sortType, search, showSearch]);
+
+
+  const handleFetch = async() =>{
+    try {
+        const response = await ApiRequestGet.getAllProducts()
+        console.log(response.data)    
+    } catch (error) {
+      
+    }
+  }
+
+  useEffect(() =>{
+    handleFetch()
+  },[])
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">

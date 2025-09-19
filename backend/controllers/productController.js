@@ -49,7 +49,7 @@ const getProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
  try {
     const allProducts = await productModel.find();
-
+ 
     // Always respond with JSON, even if empty
     return res.status(200).json({
       success: true,

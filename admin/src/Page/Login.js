@@ -20,7 +20,7 @@ const AdminLogin = () => {
       const response = await ApiRequestPost.login(email, password);  
 
       if (response.success) {
-        localStorage.setItem("authToken", response.token); 
+        localStorage.setItem("adminToken", response.token); 
         navigate("/app/dashboard");  
       } else {
         setErrorMessage(response.message || "Login failed");
