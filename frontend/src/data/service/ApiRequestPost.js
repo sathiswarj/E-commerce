@@ -1,7 +1,8 @@
 import { API_ENDPOINT } from "./ApiEndPoint";
-import { ApiPostServiceWrapper } from "../WrapperService";
+import { ApiPostServiceWrapper, ApiPutServiceWrapper } from "../WrapperService";
 
 export const ApiRequestPost = {
+
   register: (name, email, password) => {
     return ApiPostServiceWrapper({
       url: API_ENDPOINT.corePath + "users/register",
@@ -16,4 +17,17 @@ export const ApiRequestPost = {
       body: { email, password },
     });
   },
+
+ updateUser: (data) => {
+    const token = localStorage.getItem("authToken");
+
+    return ApiPutServiceWrapper({
+      url: API_ENDPOINT.corePath + "users/adduser",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: data,
+    });
+  }
 };

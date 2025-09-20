@@ -3,10 +3,21 @@ import {ApiGetServiceWrapper} from '../WrapperService'
 
 export const ApiRequestGet = {
   getAllProducts: () => {
-    const token = localStorage.getItem("authToken"); // read token from storage
+    const token = localStorage.getItem("authToken");  
 
     return ApiGetServiceWrapper({
-      url: API_ENDPOINT.corePath + "products", // make sure your backend route matches
+      url: API_ENDPOINT.corePath + "products", 
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+    });
+  },
+
+    getOneUser: () => {
+    const token = localStorage.getItem("authToken");  
+    return ApiGetServiceWrapper({
+      url: API_ENDPOINT.corePath + "users/getuser",  
       headers: { 
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`

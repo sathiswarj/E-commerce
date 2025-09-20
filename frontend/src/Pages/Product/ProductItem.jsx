@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { ShopContext } from "../context/Shopcontext";
+import { ShopContext } from "../../context/Shopcontext";
 
 const ProductItem = ({ name, id, price, image }) => {
   const { currency } = useContext(ShopContext);

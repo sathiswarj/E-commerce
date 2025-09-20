@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ApiRequestPost } from "../data/service/ApiRequestPost";
+import { ApiRequestPost } from "../../data/service/ApiRequestPost";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -41,7 +41,7 @@ const Login = () => {
       if (response.success === true) {
         console.log("✅ User logged in");
         localStorage.setItem("authToken", response.token);
-        navigate("/");
+        navigate("/home");
       } else {
         setErrorMessage(response.message || "Login failed");
       }

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
-import Title from "../components/Title";
-import { assets } from "../assets/assets";
-import { ShopContext } from "../context/Shopcontext";
+import Title from "../../components/Title";
+import { assets } from "../../assets/assets";
+import { ShopContext } from "../../context/Shopcontext";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");

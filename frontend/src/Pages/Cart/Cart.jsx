@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/Shopcontext";
-import Title from "../components/Title";
-import { assets } from "../assets/assets";
-import CartTotal from "../components/CartTotal";
+import { ShopContext } from "../../context/Shopcontext";
+import Title from "../../components/Title";
+import { assets } from "../../assets/assets";
+import CartTotal from "../../components/CartTotal";
 import { useNavigate } from "react-router-dom";
 const Cart = () => {
   const { cartItems, currency, products, updateCart } = useContext(ShopContext);
