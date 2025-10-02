@@ -1,19 +1,26 @@
 import React, { useContext, useState, useEffect } from "react";
-import { ShopContext } from "../context/Shopcontext.jsx";
-import ProductItem from "./Product/ProductItem.jsx";
+ import ProductItem from "./Product/ProductItem.jsx";
 import { assets } from "../assets/assets.js";
 import Title from "../components/Title.jsx";
-import { ApiRequestGet } from "../data/service/ApiRequestGet.js";
+import { fetchAllProducts } from "../redux/Product/productReducer.js";
+import { useDispatch, useSelector } from "react-redux";
 
 const Collection = () => {
-  const { products, search, showSearch } = useContext(ShopContext);
+  const dispatch = useDispatch();
+ 
+   const { items: products, loading, error } = useSelector((state) => state.products);
+
   const [showFilter, setShowFilter] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState("relevant");
   const [filterProducts, setFilterProducts] = useState([]);
 
-  const handleCheckboxChange = (category) => {
+   useEffect(() => {
+    dispatch(fetchAllProducts());
+  }, [dispatch]);
+
+   const handleCheckboxChange = (category) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
         ? prev.filter((cat) => cat !== category)
@@ -29,14 +36,15 @@ const Collection = () => {
     );
   };
 
+  // ✅ Filter logic
   const applyFilter = (products) => {
     let filtered = [...products];
 
-    if (search && showSearch) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+    // if (search && showSearch) {
+    //   filtered = filtered.filter((product) =>
+    //     product.name?.toLowerCase().includes(search.toLowerCase())
+    //   );
+    // }
 
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((product) =>
@@ -53,9 +61,9 @@ const Collection = () => {
     return filtered;
   };
 
+  // ✅ Sorting logic
   const sortProduct = (productList) => {
     let sorted = [...productList];
-
     switch (sortType) {
       case "low-high":
         sorted.sort((a, b) => a.price - b.price);
@@ -66,31 +74,17 @@ const Collection = () => {
       default:
         break;
     }
-
     return sorted;
   };
 
+  // ✅ Update filtered products whenever dependencies change
   useEffect(() => {
     if (Array.isArray(products)) {
       let filtered = applyFilter(products);
       let sorted = sortProduct(filtered);
       setFilterProducts(sorted);
     }
-  }, [products, selectedCategories, subCategory, sortType, search, showSearch]);
-
-
-  const handleFetch = async() =>{
-    try {
-        const response = await ApiRequestGet.getAllProducts()
-        console.log(response.data)    
-    } catch (error) {
-      
-    }
-  }
-
-  useEffect(() =>{
-    handleFetch()
-  },[])
+  }, [products, selectedCategories, subCategory, sortType]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
@@ -153,7 +147,6 @@ const Collection = () => {
         </div>
       </div>
 
-
       <div className="flex-1">
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <Title text1={"ALL"} text2={"COLLECTIONS"} />
@@ -168,6 +161,9 @@ const Collection = () => {
           </select>
         </div>
 
+         {loading && <p>Loading products...</p>}
+        {error && <p className="text-red-500">Error: {error}</p>}
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
           {filterProducts.map((product) => (
             <ProductItem
@@ -175,7 +171,11 @@ const Collection = () => {
               id={product._id}
               name={product.name}
               price={product.price}
-              image={product.image}
+              image={
+                Array.isArray(product.images) && product.images.length > 0
+                  ? product.images[0]
+                  : "/fallback.png"
+              }
             />
           ))}
         </div>

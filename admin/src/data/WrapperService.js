@@ -48,17 +48,20 @@ export const ApiGetServiceWrapperBlob = async ({ url = "", headers = {} }) => {
 };
 
 export const ApiPostServiceWrapper = async ({ url = "", headers = {}, body = {} }) => {
+  const isFormData = body instanceof FormData;
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: "Bearer " + getToken(),
-      "Content-Type": "application/json",
+       ...(isFormData ? {} : { "Content-Type": "application/json" }),
       "Cache-Control": "no-cache",
       Pragma: "no-cache",
       ...headers,
     },
-    body: JSON.stringify(body),
+    body: isFormData ? body : JSON.stringify(body),
   });
+
   return handleResponse(res);
 };
 
