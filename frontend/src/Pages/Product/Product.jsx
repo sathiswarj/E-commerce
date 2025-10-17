@@ -2,58 +2,37 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { assets } from "../../assets/assets";
 import RelatedProducts from "../../components/Card/RelatedProducts";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchOneProduct } from "../../redux/Product/productReducer";
 
 const Product = () => {
   const { productId } = useParams();
-  const [product, setProduct] = useState(null);
+  const dispatch = useDispatch();
+
+  const { selectedProduct: product, loading, error } = useSelector(
+    (state) => state.products
+  );
+
   const [image, setImage] = useState("");
   const [size, setSize] = useState(null);
 
-  // ✅ Dummy product data
-  const products = [
-    {
-      _id: "1",
-      name: "Classic Shirt",
-      description: "A comfortable cotton shirt perfect for all occasions.",
-      price: 499,
-      category: "Men",
-      subCategory: "Topwear",
-      sizes: ["S", "M", "L", "XL"],
-      image: [
-        "https://res.cloudinary.com/demo/image/upload/v1680000000/shirt1.png",
-        "https://res.cloudinary.com/demo/image/upload/v1680000000/shirt2.png",
-        "https://res.cloudinary.com/demo/image/upload/v1680000000/shirt3.png",
-      ],
-    },
-    {
-      _id: "2",
-      name: "Elegant Dress",
-      description: "Stylish dress for formal and casual events.",
-      price: 1299,
-      category: "Women",
-      subCategory: "Topwear",
-      sizes: ["S", "M", "L"],
-      image: [
-        "https://res.cloudinary.com/demo/image/upload/v1680000000/dress1.png",
-        "https://res.cloudinary.com/demo/image/upload/v1680000000/dress2.png",
-      ],
-    },
-  ];
+  useEffect(() => {
+    dispatch(fetchOneProduct(productId));
+  }, [dispatch, productId]);
 
   useEffect(() => {
-    const item = products.find((item) => item._id === productId);
-    if (item) {
-      setProduct(item);
-      setImage(item.image[0]);
+    if (product) {
+      setImage(product.images[0] || "");
     }
-  }, [productId]);
+  }, [product]);
 
   const addToCart = (id, size) => {
     alert(`Added product ${id} (size: ${size}) to cart`);
   };
 
-  if (!product)
-    return <div className="p-10 text-center">Loading product...</div>;
+  if (loading) return <div className="p-10 text-center">Loading product...</div>;
+  if (error) return <div className="p-10 text-center text-red-500">{error}</div>;
+  if (!product) return null;
 
   return (
     <div className="border-t-2 pt-10 px-5 sm:px-20 transition-opacity ease-in duration-500 opacity-100">
@@ -61,11 +40,11 @@ const Product = () => {
         {/* Images */}
         <div className="flex flex-col-reverse sm:flex-row gap-3 flex-1">
           <div className="flex sm:flex-col overflow-x-auto overflow-y-auto justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {product.image.map((img, index) => (
+            {product.images.map((img, index) => (
               <img
                 key={index}
                 src={img}
-                alt=""
+                alt={product.name}
                 onClick={() => setImage(img)}
                 className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
               />
@@ -113,7 +92,7 @@ const Product = () => {
 
           <button
             className="mt-12 mb-[15px] bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition"
-            onClick={() => addToCart(product._id, size)}
+            onClick={() => addToCart(product.productId, size)}
           >
             ADD TO CART
           </button>

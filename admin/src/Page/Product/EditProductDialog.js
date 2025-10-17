@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ApiRequestPost } from "../../data/service/ApiRequestPost";
 
-const Popup = ({ onClose, onSave }) => {
+const EditProductDialog = ({ product, onClose }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -13,6 +13,22 @@ const Popup = ({ onClose, onSave }) => {
     bestSeller: false,
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (product) {
+      console.log("Editing product:", product); // DEBUG
+      setFormData({
+        name: product.name || "",
+        description: product.description || "",
+        category: product.category || "",
+        subCategory: product.subCategory || "",
+        price: product.price || "",
+        sizes: product.sizes || [],
+        images: [],
+        bestSeller: product.bestSeller || false,
+      });
+    }
+  }, [product]);
 
   const categoryOptions = ["Men", "Women", "Kids"];
   const subCategoryOptions = ["Topwear", "Bottomwear", "Winterwear"];
@@ -37,56 +53,76 @@ const Popup = ({ onClose, onSave }) => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    
-     const maxSize = 1024 * 1024; // 1MB
-    const validFiles = files.filter(file => {
+    const maxSize = 1024 * 1024; // 1MB
+    const validFiles = files.filter((file) => {
       if (file.size > maxSize) {
-        alert(`${file.name} is too large. Please select images under 1MB.`);
+        alert(`${file.name} is too large. Max 1MB`);
         return false;
       }
       return true;
     });
-    
-     if (validFiles.length > 3) {
-      alert("Please select maximum 3 images");
+    if (validFiles.length > 3) {
+      alert("Select maximum 3 images");
       return;
     }
-    
     setFormData((prev) => ({ ...prev, images: validFiles }));
   };
 
   const handleSubmit = async () => {
+    if (!formData.name.trim()) {
+      alert("Product name is required");
+      return;
+    }
+    if (!formData.category) {
+      alert("Category is required");
+      return;
+    }
+    if (!formData.price || formData.price <= 0) {
+      alert("Valid price is required");
+      return;
+    }
+
     setLoading(true);
     try {
       const formPayload = new FormData();
-      formPayload.append("name", formData.name);
-      formPayload.append("description", formData.description);
+ 
+      formPayload.append("name", formData.name.trim());
+      formPayload.append("description", formData.description.trim());
       formPayload.append("category", formData.category);
       formPayload.append("subCategory", formData.subCategory);
-      formPayload.append("price", formData.price);
-      formPayload.append("bestSeller", formData.bestSeller);
+      formPayload.append("price", formData.price.toString());
+      formPayload.append("bestSeller", formData.bestSeller.toString());
+      formPayload.append("sizes", JSON.stringify(formData.sizes));
 
-       formPayload.append("sizes", JSON.stringify(formData.sizes));
-
-       formData.images.forEach((file, index) => {
+      // Append images
+      formData.images.forEach((file, index) => {
         formPayload.append(`image${index + 1}`, file);
       });
 
-      const product = await ApiRequestPost.addProduct(formPayload);
+      // Log FormData contents
+      for (let pair of formPayload.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
-      if (product) {
-        alert("Product added successfully!");
-        onSave?.(product);
+      const response = await ApiRequestPost.editProduct(
+        product.productId,
+        formPayload
+      );
+
+ 
+
+      if (response && response.success) {
+        const updatedProduct = response.data;
+ 
         onClose();
+      } else {
+        throw new Error(response?.message || "Update failed");
       }
     } catch (error) {
-      console.error("Error adding product:", error);
-      if (error.status === 413) {
-        alert("Images are too large. Please select smaller images or reduce the number of images.");
-      } else {
-        alert("Failed to add product. Please try again.");
-      }
-    } finally {
+      console.error("=== UPDATE ERROR ===");
+      console.error("Error:", error);
+ 
+     } finally {
       setLoading(false);
     }
   };
@@ -94,42 +130,44 @@ const Popup = ({ onClose, onSave }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded shadow-lg w-96 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4">Add Item</h2>
+        <h2 className="text-lg font-semibold mb-4">Edit Product (ID: {product?.name})</h2>
 
          <div className="mb-2">
-          <label className="block text-sm font-medium">Name</label>
+          <label className="block text-sm font-medium">Name *</label>
           <input
             name="name"
             value={formData.name}
             onChange={handleChange}
             className="border px-2 py-1 w-full rounded"
-            disabled={loading}
+            required
           />
         </div>
 
          <div className="mb-2">
           <label className="block text-sm font-medium">Description</label>
-          <input
+          <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             className="border px-2 py-1 w-full rounded"
-            disabled={loading}
+            rows="3"
           />
         </div>
 
          <div className="mb-2">
-          <label className="block text-sm font-medium">Category</label>
+          <label className="block text-sm font-medium">Category *</label>
           <select
             name="category"
             value={formData.category}
             onChange={handleChange}
             className="border px-2 py-1 w-full rounded"
-            disabled={loading}
+            required
           >
             <option value="">Select Category</option>
             {categoryOptions.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
         </div>
@@ -141,24 +179,27 @@ const Popup = ({ onClose, onSave }) => {
             value={formData.subCategory}
             onChange={handleChange}
             className="border px-2 py-1 w-full rounded"
-            disabled={loading}
           >
             <option value="">Select Sub-Category</option>
             {subCategoryOptions.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
         </div>
 
          <div className="mb-2">
-          <label className="block text-sm font-medium">Price</label>
+          <label className="block text-sm font-medium">Price *</label>
           <input
             name="price"
             type="number"
+            min="0"
+            step="0.01"
             value={formData.price}
             onChange={handleChange}
             className="border px-2 py-1 w-full rounded"
-            disabled={loading}
+            required
           />
         </div>
 
@@ -171,7 +212,6 @@ const Popup = ({ onClose, onSave }) => {
                   type="checkbox"
                   checked={formData.sizes.includes(size)}
                   onChange={() => handleSizeChange(size)}
-                  disabled={loading}
                 />
                 {size}
               </label>
@@ -185,14 +225,13 @@ const Popup = ({ onClose, onSave }) => {
             name="bestSeller"
             checked={formData.bestSeller}
             onChange={handleChange}
-            disabled={loading}
           />
           <label className="text-sm font-medium">Best Seller</label>
         </div>
 
          <div className="mb-4">
           <label className="block text-sm font-medium mb-1">
-            Images (Max 3 images, under 1MB each)
+            Upload New Images (Max 3, Optional)
           </label>
           <input
             type="file"
@@ -200,41 +239,35 @@ const Popup = ({ onClose, onSave }) => {
             accept="image/*"
             onChange={handleImageChange}
             className="border px-2 py-1 w-full rounded"
-            disabled={loading}
           />
           {formData.images.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs text-gray-500 mb-2">
-                {formData.images.length} image(s) selected
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {formData.images.map((file, idx) => (
-                  <img
-                    key={idx}
-                    src={URL.createObjectURL(file)}
-                    alt="preview"
-                    className="w-16 h-16 object-cover rounded border"
-                  />
-                ))}
-              </div>
+            <div className="mt-2 flex gap-2 flex-wrap">
+              {formData.images.map((file, idx) => (
+                <img
+                  key={idx}
+                  src={URL.createObjectURL(file)}
+                  alt="preview"
+                  className="w-16 h-16 object-cover rounded border"
+                />
+              ))}
             </div>
           )}
         </div>
 
-         <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition-colors"
+         <div className="flex justify-end gap-2 mt-4">
+          <button 
+            onClick={onClose} 
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
             disabled={loading}
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
             disabled={loading}
           >
-            {loading ? "Adding..." : "Save"}
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
@@ -242,4 +275,4 @@ const Popup = ({ onClose, onSave }) => {
   );
 };
 
-export default Popup;
+export default EditProductDialog;

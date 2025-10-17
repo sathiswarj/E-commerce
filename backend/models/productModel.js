@@ -1,7 +1,14 @@
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 const productSchema = new mongoose.Schema(
   {
+    productId: {
+      type: String,
+      default: uuidv4,
+      unique: true,
+      index: true
+    },
     name: {
       type: String,
       required: false,
@@ -23,11 +30,11 @@ const productSchema = new mongoose.Schema(
       required: false,
     },
     sizes: {
-      type: [String], // e.g. ["S", "M", "L"]
+      type: [String], 
       required: false,
     },
     images: {
-      type: [String], 
+      type: [String],
       required: false,
     },
     bestSeller: {
@@ -36,7 +43,7 @@ const productSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,  
+    timestamps: true,
   }
 );
 

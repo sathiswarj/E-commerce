@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-const ProductItem = ({ id, name, image, price }) => {
-  return (
-    <Link className="cursor-pointer" to={`/product/${id}`}>
+ const ProductItem = ({ productId, name, image, price }) => {
+   return (
+    <Link className="cursor-pointer" to={`/product/${productId}`}>
       <div className="overflow-hidden">
         <img
           className="hover:scale-110 transition ease-in-out"

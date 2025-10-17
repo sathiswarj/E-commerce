@@ -42,7 +42,8 @@ const CommonTable = ({ columns = [], data = [] }) => {
                       key={colIdx}
                       className="px-6 py-3 text-sm text-gray-800 border-b"
                     >
-                      {value || "-"}
+                      {/* Render custom Cell if provided */}
+                      {col.Cell ? col.Cell({ row, value }) : value || "-"}
                     </td>
                   );
                 })}

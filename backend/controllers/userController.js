@@ -4,8 +4,7 @@ import jwt from 'jsonwebtoken';
 
 // Generate JWT
 const generateToken = (user) => {
-  // store userId in token
-  return jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '30d' });
+   return jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
 // Login user

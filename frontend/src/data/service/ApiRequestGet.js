@@ -24,4 +24,16 @@ export const ApiRequestGet = {
       },
     });
   },
+
+  getOneProduct: (id) => {
+    const token = localStorage.getItem("authToken");  
+
+    return ApiGetServiceWrapper({
+      url: API_ENDPOINT.corePath + `products/${id}`, 
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+    });
+  },
 };

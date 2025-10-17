@@ -80,9 +80,33 @@ export const ApiPutServiceWrapper = async ({ url = "", headers = {}, body = {} }
   return handleResponse(res);
 };
 
+
 export const ApiPatchServiceWrapper = async ({ url = "", headers = {}, body = {} }) => {
-  const res = await fetch(url, {
+   const isFormData = body instanceof FormData;
+  
+  const fetchOptions = {
     method: "PATCH",
+    headers: {
+      Authorization: "Bearer " + getToken(),
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+      ...headers,
+    },
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+   if (!isFormData) {
+    fetchOptions.headers["Content-Type"] = "application/json";
+  }
+ 
+  const res = await fetch(url, fetchOptions);
+  return handleResponse(res);
+};
+
+
+export const ApiDeleteServiceWrapper = async ({ url = "", headers = {}  }) => {
+  const res = await fetch(url, {
+    method: "DELETE",
     headers: {
       Authorization: "Bearer " + getToken(),
       "Content-Type": "application/json",
@@ -90,7 +114,6 @@ export const ApiPatchServiceWrapper = async ({ url = "", headers = {}, body = {}
       Pragma: "no-cache",
       ...headers,
     },
-    body: JSON.stringify(body),
-  });
+   });
   return handleResponse(res);
 };

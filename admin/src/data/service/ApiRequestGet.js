@@ -16,4 +16,13 @@ export const ApiRequestGet = {
          
         });
       },
+       getOneProduct: (id) => {
+       
+          return ApiGetServiceWrapper({
+            url: API_ENDPOINT.corePath + `products/${id}`, 
+            headers: { 
+              "Content-Type": "application/json",
+             },
+          });
+        },
 }
