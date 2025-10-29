@@ -4,6 +4,7 @@ import { assets } from "../../assets/assets";
 import RelatedProducts from "../../components/Card/RelatedProducts";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchOneProduct } from "../../redux/Product/productReducer";
+import { ApiRequestPost } from "../../data/service/ApiRequestPost";
 
 const Product = () => {
   const { productId } = useParams();
@@ -26,9 +27,17 @@ const Product = () => {
     }
   }, [product]);
 
-  const addToCart = (id, size) => {
-    alert(`Added product ${id} (size: ${size}) to cart`);
-  };
+const addToCart = async (product) => {
+  try {
+    const response = await ApiRequestPost.addToCart({
+      productId: product.productId ,
+      quantity: 1,
+    });
+    console.log("Added to cart:", response);
+  } catch (error) {
+    console.error("Add to cart failed:", error);
+  }
+};
 
   if (loading) return <div className="p-10 text-center">Loading product...</div>;
   if (error) return <div className="p-10 text-center text-red-500">{error}</div>;
@@ -92,7 +101,7 @@ const Product = () => {
 
           <button
             className="mt-12 mb-[15px] bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition"
-            onClick={() => addToCart(product.productId, size)}
+            onClick={() => addToCart(product)}
           >
             ADD TO CART
           </button>

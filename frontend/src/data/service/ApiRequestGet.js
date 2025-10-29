@@ -36,4 +36,17 @@ export const ApiRequestGet = {
       },
     });
   },
+
+
+   getAllCart: () => {
+    const token = localStorage.getItem("authToken");
+
+    return ApiGetServiceWrapper({
+      url: API_ENDPOINT.corePath + "carts",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+     });
+  },
 };

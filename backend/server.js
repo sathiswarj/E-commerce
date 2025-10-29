@@ -6,7 +6,7 @@ import userRoutes from './routes/userRoute.js';
 import productRoutes from './routes/productRoute.js';
 import adminRoutes from './routes/adminRoute.js'
 import connectCloudinary from "./config/cloudinary.js";
-
+import cartRoutes from './routes/cartRoute.js'
 const app = express();
 const PORT = 5000;
 
@@ -29,6 +29,7 @@ connectCloudinary();
 // User routes
 app.use("/api/users", userRoutes);
 app.use('/api/products', productRoutes)
+app.use('/api/carts', cartRoutes)
 app.use('/api/', adminRoutes)
 
  app.use((req, res, next) => {

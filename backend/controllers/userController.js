@@ -3,37 +3,58 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { sendResetOtpEmail } from '../service/emailService.js';
 import otpModel from '../models/otpModel.js';
- const generateToken = (user) => {
-   return jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '30d' });
+const generateToken = (user) => {
+   return jwt.sign(
+     { 
+       userId: user.userId,
+       email: user.email,
+       role: user.role,
+       name: user.name
+     }, 
+     process.env.JWT_SECRET, 
+     { expiresIn: '30d' }
+   );
 };
-
- const loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   try {
+    console.log('Login attempt:', req.body);
+    
     const { email, password } = req.body;
-    const user = await userModel.findOne({ email });
+    
+     const user = await userModel.findOne({ email }).select('+password');
+    
+    console.log('User found:', user ? 'Yes' : 'No');
 
     if (!user) return res.status(400).json({ success: false, message: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
+    
     if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
 
     const token = generateToken(user);
+    console.log('Token generated:', token ? 'Yes' : 'No');
+    
+     user.lastLogin = new Date();
+    await user.save();
+    
     return res.status(200).json({ 
       success: true, 
       token,
-      userId: user._id,
+      userId: user.userId, 
       user: {
         id: user._id,
+        userId: user.userId,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role
       }
     });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
-
 const registerUser = async (req, res) => {
   try {
     const { 
@@ -191,19 +212,61 @@ const addUser = async (req, res) => {
   }
 };
 
- const getOneUser = async (req, res) => {
+const getOneUser = async (req, res) => {
   try {
-    const userId = req.user.userId; 
-    const user = await userModel.findOne({ userId }); 
+    // Check if it's an admin request or user request
+    const { userId: queryUserId } = req.query;  // From query params for admin
+    const tokenUserId = req.user.userId;        // From token for regular users
+    const tokenEmail = req.user.email;          // From token for admin
 
-    if (user) {
-      const { password, _id, ...userWithoutPassword } = user.toObject();
-      return res.status(200).json({ success: true, message: "User data fetched", user: userWithoutPassword });
+    let user;
+
+    // If admin is querying a specific user
+    if (req.user.role === 'admin' || req.user.role === 'super_admin') {
+      if (queryUserId) {
+        // Admin querying specific user by ID
+        user = await userModel.findOne({ userId: queryUserId });
+      } else if (tokenEmail) {
+        // Admin querying their own profile
+        user = await userModel.findOne({ email: tokenEmail });
+      } else {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Please provide userId in query params' 
+        });
+      }
+    } else {
+      // Regular user can only see their own data
+      if (!tokenUserId) {
+        return res.status(401).json({ 
+          success: false, 
+          message: 'Invalid token' 
+        });
+      }
+      user = await userModel.findOne({ userId: tokenUserId });
     }
 
-    return res.status(404).json({ success: false, message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found' 
+      });
+    }
+
+    const { password, _id, ...userWithoutPassword } = user.toObject();
+    return res.status(200).json({ 
+      success: true, 
+      message: "User data fetched", 
+      user: userWithoutPassword 
+    });
+
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Failed to fetch user data', error: error.message });
+    console.error('Get user error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch user data', 
+      error: error.message 
+    });
   }
 };
 
@@ -347,11 +410,10 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// Change password (for logged-in users)
-export const changePassword = async (req, res) => {
+ export const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const userId = req.userId; // From auth middleware
+    const userId = req.userId;  
 
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ success: false, message: 'All fields are required' });

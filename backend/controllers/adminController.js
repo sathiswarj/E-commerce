@@ -15,8 +15,7 @@ const adminLogin = async (req, res) => {
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 
-    // Check email
-    if (email !== adminEmail) {
+     if (email !== adminEmail) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",

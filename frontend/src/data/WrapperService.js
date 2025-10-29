@@ -91,3 +91,18 @@ export const ApiPatchServiceWrapper = async ({ url = "", headers = {}, body = {}
   });
   return handleResponse(res);
 };
+
+
+export const ApiDeleteServiceWrapper = async ({ url = "", headers = {} }) => {
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: "Bearer " + getToken(),
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+      ...headers,
+    },
+  });
+  return handleResponse(res);
+};
