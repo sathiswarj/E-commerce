@@ -7,8 +7,7 @@ import {
   updateProduct,
 } from '../controllers/productController.js';
 import upload from '../middlewares/multer.js';
-import authMiddleware from '../middlewares/auth.js';
-
+import verifyAdmin from '../middlewares/verifyAdmin.js';
 const router = express.Router();
 
  router.post(
@@ -19,12 +18,12 @@ const router = express.Router();
     { name: 'image3', maxCount: 1 },
     { name: 'image4', maxCount: 1 },
   ]),
-  addProduct
+  verifyAdmin, addProduct 
 );
 
- router.get('/', authMiddleware, getAllProducts);
-router.get('/:productId', authMiddleware, getProduct);
-router.patch('/:productId', authMiddleware, upload.any(), updateProduct);
-router.delete('/:productId', authMiddleware, deleteProduct);
+ router.get('/', verifyAdmin, getAllProducts);
+router.get('/:productId', verifyAdmin, getProduct);
+router.patch('/:productId', verifyAdmin, upload.any(), updateProduct);
+router.delete('/:productId', verifyAdmin, deleteProduct);
 
 export default router;

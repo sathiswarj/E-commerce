@@ -4,6 +4,7 @@ import DashboardLayout from "./Components/Dashboard/DashboardLayout";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import UserManagement from "./Page/UserManagement";
 import ProductManagement from "./Page/ProductsManagement";
+import ChangePasswordSidebar from "./Page/ChangePassword";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="user-management" element={<UserManagement />} />
           <Route path="product-management" element={<ProductManagement />} />
+          <Route path="change-password" element={<ChangePasswordSidebar />}/>
         </Route>
       </Routes>
  

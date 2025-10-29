@@ -23,8 +23,7 @@ const CommonTable = ({ columns = [], data = [] }) => {
                 {columns.map((col, colIdx) => {
                   let value = row[col.accessor];
 
-                  // Format "Created At" column
-                  if (col.accessor === "createdAt" && value) {
+                   if (col.accessor === "createdAt" && value) {
                     const date = new Date(value);
                     const day = String(date.getDate()).padStart(2, "0");
                     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -32,8 +31,7 @@ const CommonTable = ({ columns = [], data = [] }) => {
                     value = `${day}-${month}-${year}`;
                   }
 
-                  // Format arrays as comma-separated strings
-                  if (Array.isArray(value)) {
+                   if (Array.isArray(value)) {
                     value = value.join(", ");
                   }
 
@@ -42,8 +40,7 @@ const CommonTable = ({ columns = [], data = [] }) => {
                       key={colIdx}
                       className="px-6 py-3 text-sm text-gray-800 border-b"
                     >
-                      {/* Render custom Cell if provided */}
-                      {col.Cell ? col.Cell({ row, value }) : value || "-"}
+                       {col.Cell ? col.Cell({ row, value }) : value || "-"}
                     </td>
                   );
                 })}

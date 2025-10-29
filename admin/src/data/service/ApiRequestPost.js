@@ -2,6 +2,21 @@ import { API_ENDPOINT } from "./ApiEndPoint";
 import { ApiPatchServiceWrapper, ApiPostServiceWrapper,ApiDeleteServiceWrapper } from "../WrapperService";
 
 export const ApiRequestPost = {
+addUsers: (name, email, password, phone, role, isActive, isEmailVerified) => {
+  return ApiPostServiceWrapper({
+    url: API_ENDPOINT.corePath + "users/register",
+    headers: { "Content-Type": "application/json" },
+    body: { 
+      name, 
+      email, 
+      password, 
+      phone,
+      role,
+      isActive,
+      isEmailVerified
+    },
+  });
+},
   login: (email, password) => {
     return new Promise((resolve, reject) => {
       ApiPostServiceWrapper({

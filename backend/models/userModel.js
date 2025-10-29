@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 const userSchema = new mongoose.Schema(
-
   {
     userId: {
       type: String,
       default: uuidv4,  
-      unique: true     
+      unique: true,
+      index: true   
     },
     name: {
       type: String,
@@ -20,10 +20,19 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      index: true,   
+      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']  
     },
     password: {
       type: String,
       required: true,
+      minlength: 6,   
+      select: false  
+    },
+    role: {
+      type: String,
+      enum: ["customer", "admin", "super_admin", "order_manager", "support", "inventory_manager", "finance_manager"],
+      default: "customer"
     },
     cartData: {
       type: Object,
@@ -32,68 +41,97 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
+      match: [/^[0-9]{10,15}$/, 'Please enter a valid phone number']
     },
     dateOfBirth: {
       type: Date,
     },
-    streetAddress: {
+    address: {
+      street: {
+        type: String,
+        trim: true,
+      },
+      city: {
+        type: String,
+        trim: true,
+      },
+      state: {
+        type: String,
+        trim: true,
+      },
+      zipCode: {
+        type: String,
+        trim: true,
+      },
+      country: {
+        type: String,
+        trim: true,
+        default: "India"
+      }
+    },
+     paymentMethod: {
+      type: String,
+      enum: ["Credit Card", "Debit Card", "PayPal", "UPI", "Bank Transfer", "Cash on Delivery"],
+    },
+    stripeCustomerId: {
       type: String,
       trim: true,
     },
-    city: {
+    razorpayCustomerId: {
       type: String,
       trim: true,
     },
-    state: {
-      type: String,
-      trim: true,
+    
+     preferences: {
+      newsletter: {
+        type: Boolean,
+        default: true,
+      },
+      notifications: {
+        type: Boolean,
+        default: true,
+      },
+      orderUpdates: {
+        type: Boolean,
+        default: true,
+      }
     },
-    zipCode: {
-      type: String,
-      trim: true,
-    },
-    country: {
-      type: String,
-      trim: true,
-    },
-    paymentMethod: {
-      type: String,
-      enum: ["Credit Card", "Debit Card", "PayPal", "Bank Transfer"],
-     },
-    cardNumber: {
-      type: String,
-      trim: true,
-    },
-    cardExpiry: {
-      type: String,
-      trim: true,
-    },
-    cardCVV: {
-      type: String,
-      trim: true,
-    },
-    newsletter: {
+    
+     isActive: {
       type: Boolean,
-      default: true,
+      default: true
     },
-    notifications: {
+    isEmailVerified: {
       type: Boolean,
-      default: true,
+      default: false
     },
-    orderUpdates: {
+    isPhoneVerified: {
       type: Boolean,
-      default: true,
+      default: false
     },
+    
+     lastLogin: {
+      type: Date
+    },
+    
     createdAt: {
       type: Date,
       default: Date.now,
     },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    }
   },
   {
     minimize: false,
+    timestamps: true  
   }
 );
 
+ userSchema.index({ email: 1 });
+userSchema.index({ userId: 1 });
+userSchema.index({ phone: 1 });
 const userModel = mongoose.models.users || mongoose.model("users", userSchema);
 
 export default userModel;
