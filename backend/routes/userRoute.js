@@ -21,7 +21,7 @@ router.put('/adduser', authMiddleware, verifyAdmin, addUser);
 router.get('/getuser', authMiddleware, verifyAdmin, getOneUser);
 router.get('/getAllUsers', verifyAdmin, getAllUsers);
 
- router.post('/request-password-reset', requestPasswordReset);
+ router.post('/request-password-reset',verifyAdmin, requestPasswordReset);
 router.post('/verify-reset-otp', verifyResetOtp);
 router.post('/reset-password', resetPassword);
 

@@ -1,7 +1,8 @@
 import userModel from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
+import { sendResetOtpEmail } from '../service/emailService.js';
+import otpModel from '../models/otpModel.js';
  const generateToken = (user) => {
    return jwt.sign({ userId: user.userId }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
@@ -238,26 +239,21 @@ export const requestPasswordReset = async (req, res) => {
     });
 
     // Send OTP via email
-    const emailResult = await sendResetOtpEmail(email, otp);
+    await sendResetOtpEmail(email, otp); // Use await directly
 
-    if (!emailResult.success) {
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Failed to send verification email. Please try again.' 
-      });
-    }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Verification code sent to your email' 
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code sent to your email'
     });
 
   } catch (error) {
-    console.error('Request password reset error:', error);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Password reset error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to send verification email. Please try again.' 
+    });
   }
 };
-
 // Verify OTP
 export const verifyResetOtp = async (req, res) => {
   try {

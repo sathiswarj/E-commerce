@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft, Mail } from 'lucide-react';
+import { ApiRequestPost } from '../data/service/ApiRequestPost';
 
 export default function PasswordResetFlow({ onBack }) {
-  const [step, setStep] = useState(1);  
+  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [formData, setFormData] = useState({
@@ -27,25 +28,20 @@ export default function PasswordResetFlow({ onBack }) {
     setLoading(true);
 
     try {
-      const response = await fetch('YOUR_API_URL/user/request-password-reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
+      // Using your API wrapper - make sure to import ApiRequestPost
+      const response = await ApiRequestPost.requestPasswordReset({ email });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         setSuccess('Verification code sent to your email!');
         setTimeout(() => {
           setStep(2);
           setSuccess('');
         }, 1500);
       } else {
-        setError(data.message || 'Failed to send verification code');
+        setError(response.message || 'Failed to send verification code');
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err?.message || 'Something went wrong. Please try again.');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -64,25 +60,20 @@ export default function PasswordResetFlow({ onBack }) {
     setLoading(true);
 
     try {
-      const response = await fetch('YOUR_API_URL/user/verify-reset-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp })
-      });
+      // Using your API wrapper
+      const response = await ApiRequestPost.verifyResetOtp({ email, otp });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         setSuccess('Code verified successfully!');
         setTimeout(() => {
           setStep(3);
           setSuccess('');
         }, 1500);
       } else {
-        setError(data.message || 'Invalid verification code');
+        setError(response.message || 'Invalid verification code');
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err?.message || 'Something went wrong. Please try again.');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -111,28 +102,23 @@ export default function PasswordResetFlow({ onBack }) {
     setLoading(true);
 
     try {
-      const response = await fetch('YOUR_API_URL/user/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          otp,
-          newPassword: formData.newPassword
-        })
+      // Using your API wrapper
+      const response = await ApiRequestPost.resetPassword({
+        email,
+        otp,
+        newPassword: formData.newPassword
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         setSuccess('Password reset successfully!');
         setTimeout(() => {
           if (onBack) onBack();
         }, 2000);
       } else {
-        setError(data.message || 'Failed to reset password');
+        setError(response.message || 'Failed to reset password');
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err?.message || 'Something went wrong. Please try again.');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -145,21 +131,16 @@ export default function PasswordResetFlow({ onBack }) {
     setLoading(true);
 
     try {
-      const response = await fetch('YOUR_API_URL/user/request-password-reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
+      // Using your API wrapper
+      const response = await ApiRequestPost.requestPasswordReset({ email });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         setSuccess('New verification code sent!');
       } else {
-        setError(data.message || 'Failed to resend code');
+        setError(response.message || 'Failed to resend code');
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(err?.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -365,7 +346,8 @@ export default function PasswordResetFlow({ onBack }) {
           </div>
         </div>
 
-         <div className="mt-6 flex justify-center gap-2">
+        {/* Progress Indicator */}
+        <div className="mt-6 flex justify-center gap-2">
           <div className={`h-2 w-16 rounded-full ${step >= 1 ? 'bg-indigo-600' : 'bg-gray-300'}`} />
           <div className={`h-2 w-16 rounded-full ${step >= 2 ? 'bg-indigo-600' : 'bg-gray-300'}`} />
           <div className={`h-2 w-16 rounded-full ${step >= 3 ? 'bg-indigo-600' : 'bg-gray-300'}`} />

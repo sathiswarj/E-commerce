@@ -66,4 +66,54 @@ deleteProduct: (productId) => {
       .catch((err) => reject(err));
   });
 },
+ 
+ requestPasswordReset: ({ email }) => {
+  return new Promise((resolve, reject) => {
+    ApiPostServiceWrapper({
+      url: `${API_ENDPOINT.corePath}users/request-password-reset`,
+      headers: { "Content-Type": "application/json" },
+      body:{ email }
+    })
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+},
+
+ verifyResetOtp: ({ email, otp }) => {
+  return new Promise((resolve, reject) => {
+    ApiPostServiceWrapper({
+      url: `${API_ENDPOINT.corePath}users/verify-reset-otp`,
+      headers: { "Content-Type": "application/json" },
+      body:  { email, otp }
+    })
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+},
+
+ resetPassword: ({ email, otp, newPassword }) => {
+  return new Promise((resolve, reject) => {
+    ApiPostServiceWrapper({
+      url: `${API_ENDPOINT.corePath}users/reset-password`,
+      headers: { "Content-Type": "application/json" },
+      body: { email, otp, newPassword }
+    })
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+},
+
+ changePasswordLogged: ({ currentPassword, newPassword }) => {
+  return new Promise((resolve, reject) => {
+    ApiPostServiceWrapper({
+      url: `${API_ENDPOINT.corePath}users/change-password`,
+      headers: { 
+        "Content-Type": "application/json",
+       },
+      body:{ currentPassword, newPassword }
+    })
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+},
 };
