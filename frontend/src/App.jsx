@@ -16,7 +16,8 @@ import "react-toastify/ReactToastify.css";
 import SearchBar from "./components/SearchBar";
 import Profile from './Pages/Profile/Profile'
 import { useLocation } from "react-router-dom";
-const App = () => {
+import Signup from './Pages/Signup/Signup'
+ const App = () => {
   const isProfile = location.pathname === "/profile"
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
@@ -25,6 +26,7 @@ const App = () => {
       <SearchBar />
       <Routes>
          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Home />} />
         <Route path="/collection" element={<Collection />} />
         <Route path="/about" element={<About />} />
@@ -33,8 +35,8 @@ const App = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
-                <Route path="/profile" element={<Profile />} />
-
+        <Route path="/profile" element={<Profile />} />
+ 
       </Routes>
       {!isProfile && <Footer />}
     </div>

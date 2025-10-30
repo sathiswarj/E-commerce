@@ -10,14 +10,20 @@ export const ApiRequestPost = {
       body: { name, email, password },
     });
   },
-  login: (email, password) => {
+  login: ({email, password}) => {
     return ApiPostServiceWrapper({
       url: API_ENDPOINT.corePath + "users/login",
       headers: { "Content-Type": "application/json" },
       body: { email, password },
     });
   },
-
+  verifyOTP: (otp) => {
+    return ApiPostServiceWrapper({
+      url: API_ENDPOINT.corePath + "users/verify-email-otp",
+      headers: { "Content-Type": "application/json" },
+      body: { otp },
+    });
+  },
  updateUser: (data) => {
     const token = localStorage.getItem("authToken");
 

@@ -19,10 +19,13 @@ const AdminLogin = () => {
     try {
       const response = await ApiRequestPost.login(email, password);  
 
-      if (response.success) {
-        localStorage.setItem("adminToken", response.token); 
-        navigate("/app/dashboard");  
-      } else {
+      if (response.success && response.user?.role) {
+  localStorage.setItem("adminToken", response.token);     
+  localStorage.setItem("userRole", response.user.role);     
+  navigate("/app/dashboard");
+}
+
+ else {
         setErrorMessage(response.message || "Login failed");
       }
     } catch (error) {

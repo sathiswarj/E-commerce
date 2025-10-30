@@ -7,6 +7,7 @@ const UserManagement = () => {
   const [data, setData] = useState([]);
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+   const userRole = localStorage.getItem("userRole")  ;
 
   useEffect(() => {
     fetchUsers();
@@ -59,14 +60,15 @@ const UserManagement = () => {
       ) : (
         <CommonTable columns={userColumns} data={data} />
       )}
+   {(userRole === "admin" || userRole === "super_admin") && showAddPopup && (
+  <AdminOnboardingDialog
+    isOpen={showAddPopup}
+    onClose={() => setShowAddPopup(false)}
+    onUserCreated={handleUserCreated}
+  />
+)}
 
-       {showAddPopup && (
-        <AdminOnboardingDialog
-          isOpen={showAddPopup}
-          onClose={() => setShowAddPopup(false)}
-          onUserCreated={handleUserCreated}
-        />
-      )}
+
     </div>
   );
 };

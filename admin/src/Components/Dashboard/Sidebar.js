@@ -18,7 +18,7 @@ import {
 const Sidebar = () => {
   const navigate = useNavigate();
   
-   const userRole = localStorage.getItem("userRole") || "admin";
+   const userRole = localStorage.getItem("userRole")  ;
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -57,7 +57,7 @@ const Sidebar = () => {
               <Link
                 key={item.path}
                 to={`/app${item.path}`}
-                className="flex items-center gap-2 py-2 px-3 rounded hover:bg-gray-100"
+                className="flex items-center gap-2 py-2 px-3 rounded hover:bg-gray-100 text-lg"
               >
                 <Icon size={18} /> {item.label}
               </Link>

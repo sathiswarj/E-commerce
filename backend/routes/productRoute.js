@@ -13,7 +13,7 @@ import authMiddleware from '../middlewares/auth.js';
 const router = express.Router();
 
  
-router.get('/', verifyAdmin, getAllProducts);   
+router.get('/', getAllProducts);   
 router.get('/:productId', getProduct);   
 
  router.post(

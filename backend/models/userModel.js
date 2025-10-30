@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
-
+ 
 const userSchema = new mongoose.Schema(
   {
     userId: {
@@ -46,6 +46,14 @@ const userSchema = new mongoose.Schema(
     dateOfBirth: {
       type: Date,
     },
+    otp: {
+      type: String,
+      required: false,
+    },
+    otpExpiresAt: {
+      type: Date,
+      required: false,
+    },
     address: {
       street: {
         type: String,
@@ -69,7 +77,7 @@ const userSchema = new mongoose.Schema(
         default: "India"
       }
     },
-     paymentMethod: {
+    paymentMethod: {
       type: String,
       enum: ["Credit Card", "Debit Card", "PayPal", "UPI", "Bank Transfer", "Cash on Delivery"],
     },
@@ -81,8 +89,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    
-     preferences: {
+    preferences: {
       newsletter: {
         type: Boolean,
         default: true,
@@ -96,8 +103,7 @@ const userSchema = new mongoose.Schema(
         default: true,
       }
     },
-    
-     isActive: {
+    isActive: {
       type: Boolean,
       default: true
     },
@@ -109,18 +115,8 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    
-     lastLogin: {
+    lastLogin: {
       type: Date
-    },
-    
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
     }
   },
   {
@@ -132,6 +128,7 @@ const userSchema = new mongoose.Schema(
  userSchema.index({ email: 1 });
 userSchema.index({ userId: 1 });
 userSchema.index({ phone: 1 });
+
 const userModel = mongoose.models.users || mongoose.model("users", userSchema);
 
 export default userModel;
