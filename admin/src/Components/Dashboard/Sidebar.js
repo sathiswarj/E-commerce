@@ -29,12 +29,12 @@ const Sidebar = () => {
    const allMenuItems = [
     { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["super_admin", "admin", "order_manager", "support", "inventory_manager", "finance_manager"] },
     { path: "/product-management", label: "Products", icon: ShoppingBag, roles: ["super_admin", "admin", "inventory_manager"] },
-    { path: "/orders", label: "Orders", icon: Package, roles: ["super_admin", "admin", "order_manager", "support"] },
+    // { path: "/orders", label: "Orders", icon: Package, roles: ["super_admin", "admin", "order_manager", "support"] },
     { path: "/user-management", label: "Customers", icon: Users, roles: ["super_admin", "admin", "support"] },
-    { path: "/reviews", label: "Reviews", icon: Star, roles: ["super_admin", "admin", "support"] },
-     { path: "/transactions", label: "Transactions", icon: DollarSign, roles: ["super_admin", "admin", "finance_manager"] },
+    // { path: "/reviews", label: "Reviews", icon: Star, roles: ["super_admin", "admin", "support"] },
+    //  { path: "/transactions", label: "Transactions", icon: DollarSign, roles: ["super_admin", "admin", "finance_manager"] },
     { path: "/support", label: "Support", icon: Headphones, roles: ["super_admin", "admin", "support"] },
-    { path: "/vendors", label: "Vendors", icon: Store, roles: ["super_admin", "admin"] },
+    // { path: "/vendors", label: "Vendors", icon: Store, roles: ["super_admin", "admin"] },
     {path:"/change-password", label:"Change password", icon: Lock, roles:["super_admin", "admin"],},
     { path: "/settings", label: "Settings", icon: Settings, roles: ["super_admin"] },
   ];

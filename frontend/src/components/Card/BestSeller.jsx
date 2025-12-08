@@ -36,7 +36,7 @@ const BestSeller = () => {
         {bestSeller.map((item) => (
           <ProductItem
             key={item._id}
-            id={item._id}
+            id={item.productId}
             image={item.images && item.images.length > 0 ? item.images[0] : ""}
             name={item.name}
             price={item.price}

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
  const ProductItem = ({ productId, name, image, price }) => {
    return (
     <Link className="cursor-pointer" to={`/product/${productId}`}>

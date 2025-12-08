@@ -87,8 +87,7 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Set OTP expiry time explicitly
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+     const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     console.log('Creating user with OTP:', otp);
     console.log('OTP will expire at:', otpExpiresAt);
@@ -148,7 +147,8 @@ const addUser = async (req, res) => {
     }
 
     const {
-      name,  
+      name,
+      email,  
       phone,
       dateOfBirth,
       streetAddress,
@@ -163,6 +163,7 @@ const addUser = async (req, res) => {
     } = req.body;
 
     if (name !== undefined) user.name = name;
+     if (email !== undefined) user.email = email;
     if (phone !== undefined) user.phone = phone;
     if (dateOfBirth !== undefined) user.dateOfBirth = dateOfBirth;
     if (streetAddress !== undefined) user.address.street = streetAddress;
