@@ -15,8 +15,8 @@ const BestSeller = () => {
 
   useEffect(() => {
     if (products.length > 0) {
-      const best = products.filter((item) => item.bestSeller); // filter best sellers
-      setBestSeller(best.slice(0, 10)); // take first 10 best sellers
+      const best = products.filter((item) => item.bestSeller); 
+      setBestSeller(best.slice(0, 10)); 
     }
   }, [products]);
 

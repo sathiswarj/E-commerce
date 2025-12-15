@@ -18,24 +18,20 @@ const generateToken = (user) => {
 
 const loginUser = async (req, res) => {
   try {
-    console.log('Login attempt:', req.body);
-    
+     
     const { email, password } = req.body;
     
     const user = await userModel.findOne({ email }).select('+password');
     
-    console.log('User found:', user ? 'Yes' : 'No');
-
+ 
     if (!user) return res.status(400).json({ success: false, message: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
-    
+     
     if (!isMatch) return res.status(400).json({ success: false, message: 'Invalid credentials' });
 
     const token = generateToken(user);
-    console.log('Token generated:', token ? 'Yes' : 'No');
-    
+     
     user.lastLogin = new Date();
     await user.save();
     
