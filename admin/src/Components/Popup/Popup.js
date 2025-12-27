@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const Popup = ({ onClose, onSave }) => {
+const ProductFormDialog = ({ 
+  product = null, // null for Add, populated for Edit
+  onClose, 
+  onSave 
+}) => {
+  const isEditMode = !!product;
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -9,6 +15,7 @@ const Popup = ({ onClose, onSave }) => {
     price: "",
     sizes: [],
     images: [],
+    heroImages: [],
     bestSeller: false,
   });
   const [loading, setLoading] = useState(false);
@@ -16,6 +23,22 @@ const Popup = ({ onClose, onSave }) => {
   const categoryOptions = ["Men", "Women", "Kids"];
   const subCategoryOptions = ["Topwear", "Bottomwear", "Winterwear"];
   const sizeOptions = ["S", "M", "L"];
+
+   useEffect(() => {
+    if (isEditMode && product) {
+      setFormData({
+        name: product.name || "",
+        description: product.description || "",
+        category: product.category || "",
+        subCategory: product.subCategory || "",
+        price: product.price || "",
+        sizes: product.sizes || [],
+        images: [],
+        heroImages: [],
+        bestSeller: product.bestSeller || false,
+      });
+    }
+  }, [product, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -54,17 +77,51 @@ const Popup = ({ onClose, onSave }) => {
     setFormData((prev) => ({ ...prev, images: validFiles }));
   };
 
+  const handleHeroImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    const maxSize = 1024 * 1024;
+    const validFiles = files.filter(file => {
+      if (file.size > maxSize) {
+        alert(`${file.name} is too large. Please select images under 1MB.`);
+        return false;
+      }
+      return true;
+    });
+    
+    if (validFiles.length > 4) {
+      alert("Please select maximum 4 hero images");
+      return;
+    }
+    
+    setFormData((prev) => ({ ...prev, heroImages: validFiles }));
+  };
+
   const handleSubmit = async () => {
+     if (!formData.name.trim()) {
+      alert("Product name is required");
+      return;
+    }
+    if (!formData.category) {
+      alert("Category is required");
+      return;
+    }
+    if (!formData.subCategory) {
+      alert("Sub-category is required");
+      return;
+    }
+    if (!formData.price || formData.price <= 0) {
+      alert("Valid price is required");
+      return;
+    }
+
     setLoading(true);
     try {
-      // Simulated API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      alert("Product added successfully!");
-      onSave?.(formData);
+      await onSave(formData);
       onClose();
     } catch (error) {
-      console.error("Error adding product:", error);
-      alert("Failed to add product. Please try again.");
+      console.error("Error saving product:", error);
+      alert("Failed to save product. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -75,7 +132,9 @@ const Popup = ({ onClose, onSave }) => {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Add New Product</h2>
+          <h2 className="text-2xl font-bold text-white">
+            {isEditMode ? `Edit Product: ${product.name}` : "Add New Product"}
+          </h2>
           <button
             onClick={onClose}
             disabled={loading}
@@ -169,6 +228,8 @@ const Popup = ({ onClose, onSave }) => {
               <input
                 name="price"
                 type="number"
+                min="0"
+                step="0.01"
                 value={formData.price}
                 onChange={handleChange}
                 placeholder="0.00"
@@ -222,10 +283,10 @@ const Popup = ({ onClose, onSave }) => {
             </div>
           </div>
 
-          {/* Images */}
+          {/* Product Images */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Product Images
+              Product Images {isEditMode && "(Optional - Add new images)"}
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-all duration-200">
               <input
@@ -234,10 +295,10 @@ const Popup = ({ onClose, onSave }) => {
                 accept="image/*"
                 onChange={handleImageChange}
                 className="hidden"
-                id="file-upload"
+                id="product-images-upload"
                 disabled={loading}
               />
-              <label htmlFor="file-upload" className="cursor-pointer">
+              <label htmlFor="product-images-upload" className="cursor-pointer">
                 <div className="flex flex-col items-center">
                   <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -272,6 +333,57 @@ const Popup = ({ onClose, onSave }) => {
               </div>
             )}
           </div>
+
+          {/* Hero Images */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Hero Images {isEditMode && "(Optional - Add new images)"}
+            </label>
+            <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-400 transition-all duration-200">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleHeroImageChange}
+                className="hidden"
+                id="hero-images-upload"
+                disabled={loading}
+              />
+              <label htmlFor="hero-images-upload" className="cursor-pointer">
+                <div className="flex flex-col items-center">
+                  <svg className="w-12 h-12 text-purple-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <p className="text-sm font-semibold text-gray-700">Click to upload hero images</p>
+                  <p className="text-xs text-gray-500 mt-1">Max 4 images, under 1MB each</p>
+                </div>
+              </label>
+            </div>
+            
+            {formData.heroImages.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-3">
+                  {formData.heroImages.length} hero image(s) selected
+                </p>
+                <div className="grid grid-cols-4 gap-3">
+                  {formData.heroImages.map((file, idx) => (
+                    <div key={idx} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="hero preview"
+                        className="w-full h-24 object-cover rounded-lg border-2 border-purple-200"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 rounded-lg transition-all duration-200 flex items-center justify-center">
+                        <p className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          Hero {idx + 1}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
@@ -294,10 +406,10 @@ const Popup = ({ onClose, onSave }) => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Adding...
+                {isEditMode ? "Updating..." : "Adding..."}
               </span>
             ) : (
-              "Add Product"
+              isEditMode ? "Update Product" : "Add Product"
             )}
           </button>
         </div>
@@ -306,4 +418,4 @@ const Popup = ({ onClose, onSave }) => {
   );
 };
 
-export default Popup;
+export default ProductFormDialog;

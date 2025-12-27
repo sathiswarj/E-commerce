@@ -37,6 +37,10 @@ const productSchema = new mongoose.Schema(
       type: [String],
       required: false,
     },
+    heroImages:{
+       type: [String],
+      required: false,
+    },
     bestSeller: {
       type: Boolean,
       default: false,

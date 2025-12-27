@@ -12,18 +12,16 @@ import authMiddleware from '../middlewares/auth.js';
 
 const router = express.Router();
 
- 
-router.get('/', getAllProducts);   
+ router.get('/', getAllProducts);   
 router.get('/:productId', getProduct);   
 
  router.post(
   '/',  
+  authMiddleware,
   verifyAdmin,     
   upload.fields([
-    { name: 'image1', maxCount: 1 },
-    { name: 'image2', maxCount: 1 },
-    { name: 'image3', maxCount: 1 },
-    { name: 'image4', maxCount: 1 },
+    { name: 'images', maxCount: 3 },   
+    { name: 'heroImages', maxCount: 4 },  
   ]),
   addProduct 
 );
@@ -32,7 +30,10 @@ router.patch(
   '/:productId',
   authMiddleware, 
   verifyAdmin,     
-  upload.any(),
+  upload.fields([
+    { name: 'images', maxCount: 3 },      
+    { name: 'heroImages', maxCount: 4 },   
+  ]),
   updateProduct
 );
 
