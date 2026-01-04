@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+import cartItemSchema from './cartModel.js';
  
 const userSchema = new mongoose.Schema(
   {
@@ -35,8 +36,8 @@ const userSchema = new mongoose.Schema(
       default: "customer"
     },
     cartData: {
-      type: Object,
-      default: {},
+      type: [cartItemSchema],
+      default: {}
     },
     phone: {
       type: String,
@@ -125,7 +126,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
- userSchema.index({ email: 1 });
+userSchema.index({ email: 1 });
 userSchema.index({ userId: 1 });
 userSchema.index({ phone: 1 });
 

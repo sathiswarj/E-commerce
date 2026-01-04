@@ -9,14 +9,16 @@ import {
 import authMiddleware from '../middlewares/auth.js';  
 
 const router = express.Router();
-router.post('/', authMiddleware, addToCart);
 
-router.get('/', authMiddleware, getCart);
+ router.post('/', authMiddleware, addToCart);
 
-router.patch('/:id', authMiddleware, updateCart);
+ router.get('/', authMiddleware, getCart);
 
- router.delete('/:cartKey', authMiddleware, removeFromCart);
+ router.patch('/:id', authMiddleware, updateCart);
 
- router.delete('/clear', authMiddleware, clearCart);
+ 
+router.delete('/clear', authMiddleware, clearCart);
+
+ router.delete('/:id', authMiddleware, removeFromCart);
 
 export default router;
