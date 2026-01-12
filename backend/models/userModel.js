@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
     },
     cartData: {
       type: [cartItemSchema],
-      default: {}
+      default: []
     },
     phone: {
       type: String,

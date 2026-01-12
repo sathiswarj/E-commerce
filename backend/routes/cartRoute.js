@@ -14,7 +14,7 @@ const router = express.Router();
 
  router.get('/', authMiddleware, getCart);
 
- router.patch('/:id', authMiddleware, updateCart);
+ router.patch('/:productId', authMiddleware, updateCart);
 
  
 router.delete('/clear', authMiddleware, clearCart);
