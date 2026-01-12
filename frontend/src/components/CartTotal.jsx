@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Title from "./Title";
 
-const CartTotal = () => {
-  // ✅ Dummy data
-  const [currency] = useState("$");
-  const [delivery_fee] = useState(50);
-  const [cartItems] = useState([
-    { id: 1, name: "Classic Shirt", price: 499, quantity: 2 },
-    { id: 2, name: "Jeans", price: 899, quantity: 1 },
-  ]);
-
-  // Calculate subtotal
-  const getCartAmount = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+const CartTotal = ({ totalAmount }) => {
+  const currency = "$";
+  const delivery_fee = 50;
 
   return (
     <div className="w-full">
@@ -25,8 +15,7 @@ const CartTotal = () => {
         <div className="flex justify-between">
           <p>Subtotal</p>
           <p>
-            {currency}
-            {getCartAmount()}
+            {currency} {totalAmount}
           </p>
         </div>
         <hr />
@@ -36,10 +25,11 @@ const CartTotal = () => {
             {currency} {delivery_fee}
           </p>
         </div>
+        <hr />
         <div className="flex justify-between font-semibold">
           <p>Total</p>
           <p>
-            {currency} {getCartAmount() + delivery_fee}
+            {currency} {totalAmount + delivery_fee}
           </p>
         </div>
       </div>

@@ -5,30 +5,34 @@ import { assets } from "../../assets/assets";
 import { useNavigate } from "react-router-dom";
 import { ApiRequestGet } from "../../data/service/ApiRequestGet";
 import { ApiRequestPost } from "../../data/service/ApiRequestPost";
+
 const Cart = () => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState([]);
+    const [totalAmount, setTotalAmount] = useState(0);
   const currency = "$";
 
-   useEffect(() => {
-    const handleFetch = async () => {
-      try {
-        const response = await ApiRequestGet.getAllCart();
-        setCartData(response.cartItems || []);
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-      }
-    };
+   const handleFetch = async () => {
+    try {
+      const response = await ApiRequestGet.getAllCart();
+      setCartData(response.cartItems || []);
+            setTotalAmount(response.totalAmount || 0);
+
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  };
+
+  useEffect(() => {
     handleFetch();
   }, []);
 
-const handleDelete = async (cartKey) => {
+const handleDelete = async (productId) => {
   try {
-    console.log("Deleting cart item:", cartKey);
-    // Pass as object with cartKey property
-    const response = await ApiRequestPost.removeCart({ cartKey });
-    console.log("Delete response:", response);
-    
+     
+    const response = await ApiRequestPost.removeCart({ 
+      productId: productId,
+    });    
     if (response && response.success) {
       await handleFetch();
     }
@@ -36,6 +40,21 @@ const handleDelete = async (cartKey) => {
     console.error("Error deleting cart item:", error);
   }
 };
+
+  const handleUpdate = async (productId, val) => {
+    try {
+       const response = await ApiRequestPost.updateCart({ 
+        productId: productId, 
+        val: val 
+      });
+       
+      if (response && response.success) {
+        await handleFetch();
+      }
+    } catch (error) {
+      console.error("Error updating cart item:", error);
+    }
+  };
 
   return (
     <div className="border-t pt-14 px-5 sm:px-10">
@@ -76,7 +95,9 @@ const handleDelete = async (cartKey) => {
                   value={item.quantity}
                   onChange={(e) => {
                     const val = Number(e.target.value);
-                    if (val > 0) updateCart(item.productId, val);
+                    if (val > 0) {
+                      handleUpdate(item.productId, val);
+                    }
                   }}
                   className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
                 />
@@ -85,7 +106,7 @@ const handleDelete = async (cartKey) => {
                   src={assets.bin_icon}
                   alt="Bin"
                   className="w-5 h-5 cursor-pointer"
-                  onClick={() => handleDelete(item.cartKey)}
+                  onClick={() => handleDelete(item.productId)}
                 />
               </div>
             ))}
@@ -93,7 +114,7 @@ const handleDelete = async (cartKey) => {
 
           <div className="flex justify-end my-20">
             <div className="w-full sm:w-[450px]">
-              <CartTotal />
+              <CartTotal  totalAmount={totalAmount}/>
               <div className="w-full text-end">
                 <button
                   onClick={() => navigate("/place-order")}

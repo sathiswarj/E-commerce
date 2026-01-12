@@ -270,8 +270,7 @@ const updateCart = async (req, res) => {
 const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { size, color } = req.query;
-    const userId = req.user.userId;
+     const userId = req.user.userId;
 
     if (!productId) {
       return res.status(400).json({
@@ -294,10 +293,7 @@ const removeFromCart = async (req, res) => {
     }
 
     user.cartData = user.cartData.filter(
-      item => !(item.productId === productId && 
-                item.size === (size || undefined) && 
-                item.color === (color || undefined))
-    );
+      item => item.productId !== productId)
 
     user.markModified('cartData');
     await user.save();

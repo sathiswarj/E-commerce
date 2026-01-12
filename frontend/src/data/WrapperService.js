@@ -77,21 +77,7 @@ export const ApiPutServiceWrapper = async ({ url = "", headers = {}, body = {} }
   return handleResponse(res);
 };
 
-export const ApiPatchServiceWrapper = async ({ url = "", headers = {}, body = {} }) => {
-  const res = await fetch(url, {
-    method: "PATCH",
-    headers: {
-      Authorization: "Bearer " + getToken(),
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-      ...headers,
-    },
-    body: JSON.stringify(body),
-  });
-  return handleResponse(res);
-};
-
+ 
 
 export const ApiDeleteServiceWrapper = async ({ url = "", headers = {} }) => {
   const res = await fetch(url, {
@@ -105,4 +91,25 @@ export const ApiDeleteServiceWrapper = async ({ url = "", headers = {} }) => {
     },
   });
   return handleResponse(res);
+};
+
+
+
+export const ApiPatchServiceWrapper = async ({ url = "", headers = {}, body = {} }) => {
+  try {
+    const res = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        ...headers,
+      },
+      body: JSON.stringify(body),
+    });
+    return await handleResponse(res);
+  } catch (error) {
+    console.error(' API PATCH Error:', error);
+    throw error;
+  }
 };

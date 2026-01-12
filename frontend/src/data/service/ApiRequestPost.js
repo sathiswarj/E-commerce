@@ -1,5 +1,5 @@
 import { API_ENDPOINT } from "./ApiEndPoint";
-import { ApiPostServiceWrapper, ApiPutServiceWrapper, ApiDeleteServiceWrapper } from "../WrapperService";
+import { ApiPostServiceWrapper, ApiPutServiceWrapper, ApiDeleteServiceWrapper,ApiPatchServiceWrapper } from "../WrapperService";
 
 export const ApiRequestPost = {
 
@@ -52,24 +52,25 @@ addToCart: (data) => {
 
 
     
- updateCart: (data) => {
-    const token = localStorage.getItem("authToken");
-
-    return ApiPutServiceWrapper({
-      url: API_ENDPOINT.corePath + "carts",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: data,
-    });
-  },
-
-removeCart: ({ cartKey }) => {   
+updateCart: async ({productId, val}) => {
   const token = localStorage.getItem("authToken");
+  return ApiPatchServiceWrapper({
+    url: API_ENDPOINT.corePath + `carts/${productId}`, 
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: { 
+      productId: productId,  
+      quantity: val 
+    },
+  });
+},
 
+removeCart: ({ productId  }) => {   
+  const token = localStorage.getItem("authToken");
   return ApiDeleteServiceWrapper({
-    url: API_ENDPOINT.corePath + `carts/${cartKey}`,
+    url: API_ENDPOINT.corePath + `carts/${productId}`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
