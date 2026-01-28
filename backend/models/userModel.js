@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import cartItemSchema from './cartModel.js';
- 
+
 const userSchema = new mongoose.Schema(
   {
     userId: {
@@ -126,9 +126,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.index({ email: 1 });
+ userSchema.index({ email: 1 });
 userSchema.index({ userId: 1 });
 userSchema.index({ phone: 1 });
+
+ userSchema.virtual('orders', {
+  ref: 'orders',
+  localField: 'userId',
+  foreignField: 'userId'
+});
 
 const userModel = mongoose.models.users || mongoose.model("users", userSchema);
 

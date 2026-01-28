@@ -5,6 +5,7 @@ import connectDB from "./config/mongodb.js";
 import userRoutes from './routes/userRoute.js';
 import productRoutes from './routes/productRoute.js';
 import adminRoutes from './routes/adminRoute.js'
+import orderRoutes from './routes/orderRoute.js'
 import connectCloudinary from "./config/cloudinary.js";
 import cartRoutes from './routes/cartRoute.js'
 
@@ -28,6 +29,7 @@ connectCloudinary();
 app.use("/api/users", userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/carts', cartRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/api/', adminRoutes);
 
 app.listen(PORT, () => {

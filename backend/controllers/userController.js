@@ -105,7 +105,7 @@ const registerUser = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Verification code sent to your email',
-      email: email  // Send email back so frontend can use it for verification
+      email: email 
     });
 
   } catch (error) {
@@ -131,6 +131,9 @@ const getAllUsers = async (req, res) => {
 const addUser = async (req, res) => {
   try {
     const userId = req.user.userId;
+
+    console.log('Updating user:', userId);
+    console.log('Request body:', req.body);
 
     const user = await userModel.findOne({ userId });
 
@@ -158,23 +161,51 @@ const addUser = async (req, res) => {
       orderUpdates
     } = req.body;
 
-    if (name !== undefined) user.name = name;
-     if (email !== undefined) user.email = email;
+     if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
     if (phone !== undefined) user.phone = phone;
     if (dateOfBirth !== undefined) user.dateOfBirth = dateOfBirth;
-    if (streetAddress !== undefined) user.address.street = streetAddress;
-    if (city !== undefined) user.address.city = city;
-    if (state !== undefined) user.address.state = state;
-    if (zipCode !== undefined) user.address.zipCode = zipCode;
-    if (country !== undefined) user.address.country = country;
     if (paymentMethod !== undefined) user.paymentMethod = paymentMethod;
-    if (newsletter !== undefined) user.preferences.newsletter = newsletter;
+
+     if (!user.address) {
+      user.address = {};
+     }
+
+     if (streetAddress !== undefined) {
+      user.address.street = streetAddress;
+     }
+    if (city !== undefined) {
+      user.address.city = city;
+     }
+    if (state !== undefined) {
+      user.address.state = state;
+     }
+    if (zipCode !== undefined) {
+      user.address.zipCode = zipCode;
+     }
+    if (country !== undefined) {
+      user.address.country = country;
+     }
+
+     if (!user.preferences) {
+      user.preferences = {};
+    }
+
+     if (newsletter !== undefined) user.preferences.newsletter = newsletter;
     if (notifications !== undefined) user.preferences.notifications = notifications;
     if (orderUpdates !== undefined) user.preferences.orderUpdates = orderUpdates;
 
-    const savedUser = await user.save();
-    console.log('User updated successfully:', savedUser.userId);
+     if (streetAddress !== undefined || city !== undefined || state !== undefined || 
+        zipCode !== undefined || country !== undefined) {
+      user.markModified('address');
+      console.log('Marked address as modified');
+    }
 
+    if (newsletter !== undefined || notifications !== undefined || orderUpdates !== undefined) {
+      user.markModified('preferences');
+    }
+
+    const savedUser = await user.save(); 
     const { password, _id, ...userData } = savedUser.toObject();
 
     return res.status(200).json({ 
@@ -192,7 +223,7 @@ const addUser = async (req, res) => {
     });
   }
 };
-
+ 
 const getOneUser = async (req, res) => {
   try {
     const { userId: queryUserId } = req.query;
@@ -262,7 +293,6 @@ export const requestPasswordReset = async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Update user with new OTP and set expiry time explicitly
     user.otp = otp;
     user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
@@ -287,12 +317,11 @@ export const requestPasswordReset = async (req, res) => {
   }
 };
 
-// Verify OTP for Email Verification (Registration)
 export const verifyEmailOtp = async (req, res) => {
   try {
     const { otp } = req.body;
 
-    if (  !otp) {
+    if (!otp) {
       return res.status(400).json({ 
         success: false, 
         message: 'Email and OTP are required' 
@@ -310,7 +339,6 @@ export const verifyEmailOtp = async (req, res) => {
       });
     }
 
-
     if (!user.otpExpiresAt || new Date() > user.otpExpiresAt) {
       return res.status(400).json({ 
         success: false, 
@@ -318,12 +346,11 @@ export const verifyEmailOtp = async (req, res) => {
       });
     }
 
- 
     user.otp = undefined;
     user.otpExpiresAt = undefined;
     await user.save();
 
-     const token = generateToken(user);
+    const token = generateToken(user);
 
     return res.status(200).json({ 
       success: true, 
@@ -346,7 +373,7 @@ export const verifyEmailOtp = async (req, res) => {
   }
 };
 
- export const verifyResetOtp = async (req, res) => {
+export const verifyResetOtp = async (req, res) => {
   try {
     const { otp } = req.body;
 
